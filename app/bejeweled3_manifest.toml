@@ -1,0 +1,26 @@
+# ReXGlue recompilation manifest for Bejeweled 3 (Xbox Live Arcade, title 584111D6, default.xex).
+#
+# Run tools/codegen.ps1 (Windows): it calls `rexglue codegen bejeweled3_manifest.toml` and the post-codegen steps. The
+# project name sets the prefix of everything generated: generated/default/bejeweled3_{init,pch,funcs}.h,
+# bejeweled3_recomp.N.cpp, and the CMake target bejeweled3_recomp built by CMakeLists.txt.
+#
+# default.xex (tools/xex_info.py, 2026-10-21): image base 0x82000000, entry point 0x822EC320, image size 0x01000000,
+# XDK 2.0.20764 (LINK / C1 / C2 16.0.11886), original PE name default.exe, version 0.0.0.1. It imports only xam.xex
+# and xboxkrnl.exe; the game has no other code module. No title update or DLC exists for it.
+
+[project]
+name = "bejeweled3"
+sdk_version = "0.10.0"
+# Your own game files: the extracted XBLA package (assets/game_root, made by tools/stfs_extract.py), with default.xex
+# at its root. Nothing from the game is distributed with this project.
+game_root = "../assets/game_root"
+
+[entrypoint]
+file_path = "../assets/game_root/default.xex"
+out_directory_path = "generated/default"
+
+# The includes are processed before this table, so whatever is set here overrides what is included.
+#   overrides.toml       written by hand: code the automatic function discovery misses, each with its evidence
+#   perf_overrides.toml  code generation options for speed (registers as C++ locals, ...); the same generated code
+#                        serves the PC and the Switch builds.
+includes = ["overrides.toml", "perf_overrides.toml"]

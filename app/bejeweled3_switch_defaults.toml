@@ -1,0 +1,28 @@
+# Bejeweled 3 (Xbox Live Arcade) for the Nintendo Switch: the settings built into the NRO (src/bejeweled3_app.h
+# BuiltInConfig). The SD card's bejeweled3.toml is applied after these and may override any of them.
+#
+# bejeweled3-nx (2026-10-21): peggle1-nx's file as its 1.0.1 shipped it. Every enhancement of
+# src/bejeweled3_enhancements.cpp is on by its own default.
+
+# The full game, not the trial.
+license_mask = 1
+
+# Renut's Direct3D-level renderer on deko3d (the only renderer of the Switch build: no Vulkan driver is linked).
+bejeweled3_renderer = "renut"
+renut_gpu_backend = "deko3d"
+
+# No log (the release; 2026-10-22, for the PGO collection and the final build): only a crash writes
+# logs/rex/rex_crash.log. A test run turns it on in the SD card's bejeweled3.toml (log_level = "info",
+# log_to_file = true; bejeweled3_touch_log = true for every touch).
+log_level = "off"
+log_to_file = false
+bejeweled3_touch_log = false
+switch_profile_report = false
+switch_profile_stacks = false
+
+# A controller without a profile signs in as a guest of the first (Peggle's local duels needed it; harmless here).
+xam_guest_signin = true
+
+# The render height in each mode. 720 in both (the game's own 1280x720).
+bejeweled3_render_height_handheld = 720
+bejeweled3_render_height_docked = 720

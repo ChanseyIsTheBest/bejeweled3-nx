@@ -1,0 +1,84 @@
+# Guest functions replaced by localized copies (tools/localize_native.py), regenerated into app/generated/hot/ by
+# tools/codegen.ps1 and by the build after every codegen, so each copy matches the code it is built with. One per line:
+# <address> <what>
+#
+# bejeweled3-nx, batch 1 (2026-10-22, the user's request: "optimise the hottest 35 functions by profiling the game on
+# ryujinx"): the 35 hottest guest functions by self time of the Switch profiler's samples in Ryujinx
+# (out/renut_tests/emu/prof2/rex_profile.log: 300 s, 1 ms stack sampling from 10 s on, Classic with a scripted
+# player making random swaps; tools/switch_hot_functions.py --from-report 4 with out/nx/bejeweled3.map). memcpy
+# (sub_825DF500) and memset (sub_825DEDD0) are hand-written natives already. Samples in the run:
+82453938 465 samples: the game thread 465
+825F9040 311 samples: mostly other guest threads (below the per-thread top lists); a vector memset with dcbz
+8245AAD8 288 samples: the game thread 288
+825328B8 241 samples: the game thread 241
+8243ACF8 160 samples: the game thread 160
+82564040 115 samples: the game thread 115
+828C6158 111 samples: mostly other guest threads (below the per-thread top lists)
+8243AB38 102 samples: the game thread 102
+8246B260 101 samples: the game thread 101
+82560080 99 samples: the game thread 99
+82420720 95 samples: the game thread 95
+828AFB28 91 samples: mostly other guest threads (below the per-thread top lists)
+828B01B0 84 samples: the game thread 4
+8243B240 83 samples: the game thread 83
+82568878 76 samples: the game thread 76
+8240FA40 65 samples: the game thread 65
+82528740 65 samples: the game thread 65
+825E07D0 62 samples: mostly other guest threads (below the per-thread top lists)
+824124C0 55 samples: the game thread 55
+82A0F590 52 samples: the game thread 52
+8241DFB0 51 samples: the game thread 51
+82451028 44 samples: the game thread 44
+8287A2D0 44 samples: mostly other guest threads (below the per-thread top lists)
+828B1F30 40 samples: mostly other guest threads (below the per-thread top lists)
+8243ADF8 36 samples: the game thread 36
+82420D80 35 samples: the game thread 35
+82A28A58 34 samples: the game thread 34
+825DD678 32 samples: the game thread 32
+828BED70 32 samples: mostly other guest threads (below the per-thread top lists)
+824516A0 30 samples: the game thread 30
+8240B9F0 28 samples: the game thread 28
+822DFF80 28 samples: the game thread 28
+8246B478 28 samples: the game thread 28
+82420BD8 28 samples: the game thread 28
+8240F9A8 28 samples: the game thread 28
+#
+# bejeweled3-nx, batch 2 (2026-10-22, the user: "optimise 35 more now we need as much as we can get let's try and get
+# down to 15ms"): the 35 hottest guest functions of the game's main thread that were not native yet, by self time in
+# the user's two console profiles of Lightning (logs/rex/rex_profile.log of the 08:42 NRO and rex_profile (23).log of
+# the 09:29 NRO, reports 4 on; tools/switch_hot_functions.py with each build's map), samples of both summed:
+824D8FF8 6.51% of the main thread in the console Lightning profiles (770 instrs, 0 calls)
+825652B0 3.84% of the main thread in the console Lightning profiles (417 instrs, 11 calls)
+82454730 2.27% of the main thread in the console Lightning profiles (559 instrs, 10 calls)
+82454FF0 2.24% of the main thread in the console Lightning profiles (400 instrs, 20 calls)
+8251B938 2.24% of the main thread in the console Lightning profiles (796 instrs, 3 calls)
+829D8BB8 1.46% of the main thread in the console Lightning profiles (132 instrs, 0 calls)
+8255EF98 1.23% of the main thread in the console Lightning profiles (23 instrs, 2 calls)
+822E00F0 1.23% of the main thread in the console Lightning profiles (46 instrs, 5 calls)
+829E0E60 1.18% of the main thread in the console Lightning profiles (295 instrs, 13 calls)
+825661E0 0.94% of the main thread in the console Lightning profiles (202 instrs, 7 calls)
+825DD758 0.85% of the main thread in the console Lightning profiles (138 instrs, 0 calls)
+82414668 0.84% of the main thread in the console Lightning profiles (769 instrs, 21 calls)
+82413F98 0.74% of the main thread in the console Lightning profiles (219 instrs, 2 calls)
+8255F178 0.69% of the main thread in the console Lightning profiles (48 instrs, 1 calls)
+82413980 0.66% of the main thread in the console Lightning profiles (116 instrs, 3 calls)
+82453410 0.63% of the main thread in the console Lightning profiles (50 instrs, 0 calls)
+8246C978 0.62% of the main thread in the console Lightning profiles (66 instrs, 3 calls)
+8240C508 0.60% of the main thread in the console Lightning profiles (42 instrs, 2 calls)
+82424C18 0.58% of the main thread in the console Lightning profiles (490 instrs, 9 calls)
+825327D8 0.56% of the main thread in the console Lightning profiles (55 instrs, 1 calls)
+8255EFF8 0.52% of the main thread in the console Lightning profiles (96 instrs, 1 calls)
+825DDCF0 0.52% of the main thread in the console Lightning profiles (150 instrs, 0 calls)
+8240BBA0 0.49% of the main thread in the console Lightning profiles (181 instrs, 6 calls)
+824513B0 0.44% of the main thread in the console Lightning profiles (25 instrs, 1 calls)
+82566510 0.42% of the main thread in the console Lightning profiles (520 instrs, 9 calls)
+82425EB8 0.41% of the main thread in the console Lightning profiles (652 instrs, 26 calls)
+82564738 0.40% of the main thread in the console Lightning profiles (239 instrs, 9 calls)
+8255F700 0.38% of the main thread in the console Lightning profiles (77 instrs, 4 calls)
+8243AB70 0.36% of the main thread in the console Lightning profiles (17 instrs, 0 calls)
+8255EA28 0.35% of the main thread in the console Lightning profiles (43 instrs, 6 calls)
+82531F10 0.35% of the main thread in the console Lightning profiles (5 instrs, 0 calls)
+8241F2F0 0.35% of the main thread in the console Lightning profiles (57 instrs, 2 calls)
+82A161E0 0.34% of the main thread in the console Lightning profiles (68 instrs, 3 calls)
+82450F68 0.33% of the main thread in the console Lightning profiles (46 instrs, 0 calls)
+82467838 0.30% of the main thread in the console Lightning profiles (646 instrs, 20 calls)

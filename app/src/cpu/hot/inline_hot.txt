@@ -1,0 +1,16 @@
+# Leaf functions the localized copies call inline (tools/localize_native.py, inline_callees), besides the generator's
+# tiny leaves (12 guest instructions or fewer): the console profile's hottest leaves of up to 160 instructions.
+# bejeweled3-nx, 2026-10-22, from the 11:03 NRO's Lightning run (bejeweled3_001 (4).log: calls in the run; the call
+# sites are the copies'). Hand-written natives (sub_822DFF80 among the hottest) keep their hooks.
+8246B260  # 20.6 M calls, 38 instructions, 4 call sites
+8243AB38  # 19.3 M calls, 14 instructions, 66 call sites
+82450F68  # 12.6 M calls, 46 instructions, 4 call sites
+825DD678  # 12.3 M calls, 142 instructions, 102 call sites
+825DD758  # 12.2 M calls, 138 instructions, 88 call sites
+825328B8  # 12.1 M calls, 29 instructions, 2 call sites
+8240FA40  # 11.4 M calls, 18 instructions, 2 call sites
+82A0F590  # 6.6 M calls, 36 instructions, 16 call sites
+8246B478  # 4.3 M calls, 25 instructions, 2 call sites
+8243AB70  # 3.7 M calls, 17 instructions, 16 call sites
+825E07D0  # 2.7 M calls, 99 instructions, 4 call sites
+825F9040  # 2.1 M calls, 104 instructions, 70 call sites
