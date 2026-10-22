@@ -23,11 +23,6 @@
 *.ptx
 *.rton
 
-# The hand-written natives (app/src/cpu/hot/h_<ADDR>.h, docs/hand-natives.md) are written against the code generated
-# from default.xex, and one is generated from it (tools/hand_native_824D8FF8.py): they stay with the player's own build
-# (tools/localize_native.py uses a hand-written native only when its file is there, the localized copy otherwise).
-/app/src/cpu/hot/h_*.h
-
 # --- Build output --------------------------------------------------------------
 /out/
 /outnx/
