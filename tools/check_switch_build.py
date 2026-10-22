@@ -37,17 +37,24 @@ ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 # peggle1-nx (2026-10-21, the first Switch build; tools/ppc_dis.py): Peggle 1's seven, all in the network libraries'
 # error paths (`lbz r11,2145(r3)`; clear it if set; `b .`): 0x8263B494, 0x8263DD9C, 0x82640060, 0x826454E4,
 # 0x82645C84 and 0x82645EB0, 0x82647D64, 0x826480E8. (Peggle 2's were sub_8242E838 and sub_82527248.)
-KNOWN_HALTS = ['sub_8263B480', 'sub_8263DD30', 'sub_8263FFC0', 'sub_82645340', 'sub_82645B70', 'sub_826477E8',
-               'sub_82648018']
+# bejeweled3-nx (2026-10-22): Bejeweled 3's one, sub_8254E850 (Xbox360AppDriver::DoExit: it prints
+# "Xbox360AppDriver::DoExit(): %d" through sub_824233F0, then `b .` until the console ends the title).
+KNOWN_HALTS = ['sub_8254E850']
 # Vector fused multiply-adds that come from the guest's OWN fused operations (fmadds -> std::fma), two of them paired
 # into one vector instruction by GCC (exact: each lane is the same fused operation). Checked in the disassembly:
 # fcvtl to double, fmla v.2d, fcvtn back, as double(float(std::fma(a, b, c))) twice.
-KNOWN_VECTOR_FMA = {'sub_823F6360': 'two std::fma of the localized copy n_823F6360 (first LTO + PGO build, 2026-10-14)'}
+# bejeweled3-nx (2026-10-22, the 1.0.0 LTO + PGO build): one std::fma of the localized copy n_8298AD60 as a
+# by-element fmla (`fmla v15.2d, v31.2d, v31.d[1]`: its two factors in one register, only lane 0 used), then fcvt to
+# single and back: double(float(std::fma(a, b, c))), the guest's own fmadds.
+KNOWN_VECTOR_FMA = {'sub_8298AD60': 'one std::fma of the localized copy n_8298AD60, lane 0 of a by-element fmla '
+                                    '(first LTO + PGO build, 2026-10-22)'}
 # The game's streaming copies for an unaligned source (65 lvx128, one lvsl, 72 vperm128 per kilobyte): the functions
 # GCC's early register allocation pass miscompiled (2026-10-13). They are compiled alone and their lookups checked.
 # peggle1-nx (2026-10-21): Peggle 1's two (72 vperm each, with lvsl: the same shape); Peggle 2's were sub_8260E9C0 and
 # sub_8260E164.
-STREAMING_COPIES = ['sub_82467580', 'sub_82466D24']
+# bejeweled3-nx (2026-10-22): Bejeweled 3's two (72 vperm128 and one lvsl each, the same shape), found by the count
+# of vperm and lvsl in the generated code.
+STREAMING_COPIES = ['sub_825FA9B0', 'sub_825FA154']
 DEVKITA64 = next((d + '/devkitA64/bin/' for d in (os.environ.get('DEVKITPRO', ''), 'C:/devkitPro', '/opt/devkitpro')
                   if d and os.path.isdir(d + '/devkitA64/bin')), 'C:/devkitPro/devkitA64/bin/')
 EXE = '.exe' if os.name == 'nt' else ''

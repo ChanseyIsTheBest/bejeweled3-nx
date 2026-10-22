@@ -716,3 +716,37 @@ able to tap and swipe the gems to swap them".
   - Every 10 s it logs "[swtri]" with the image's +104 / +108 words.
   - Silent in random pad play on the PC and in Ryujinx (no call). The user: the effect comes with matching 4 or 5
     in Lightning; they test on the console.
+
+## Optimising the hot functions; the 1.0.0 release (2026-10-22)
+
+- **The method** is docs/optimising-functions.md (and docs/hand-natives.md for the hand-written natives). In order:
+  - 35 more localized copies (batch 2);
+  - four hand-written natives (`sub_82453938` the curve cache, `sub_822DFF80` the 3x3 product, `sub_824D8FF8` the
+    software rasterizer by `tools/hand_native_824D8FF8.py`, `sub_8255EF98` a setter);
+  - write-backs of only the changed registers in every copy (`tools/hand_native_dirty_sync.py`, run by
+    `localize_native.py`);
+  - 313 more copies from the console profiles (`app/src/cpu/hot/localized_bulk.txt`, 8 shard TUs);
+  - leaf callees inlined in the copies (`inline_callees`, `app/src/cpu/hot/inline_hot.txt`);
+  - direct hook dispatch in play builds (`bejeweled3_cpu_hook_counters`, off by default).
+- **The console, heavy Lightning, 1020 MHz:** 25.4 ms a frame (10:41 NRO), 20.5 ms (11:03), 15.4 ms (11:24, a lighter
+  scene).
+- **Verify mode with 388 natives** does not leave the loading screen in 150 s on the PC (every leaf copy's every call
+  is checked during loading); the same build plays normally without it. One DIFFERENCE was a race (`sub_828AFB28`'s
+  f0, an audio field another thread wrote between the native's run and the original's).
+- **One console start of the 10:21 NRO hung** before the PopCap logo (the intro video). It was not reproduced, and
+  the hand-written natives had not run yet. The profiler now keeps the previous run's report
+  (`logs/rex/rex_profile_prev.log`).
+- **The release, 1.0.0:**
+  - PGO: the instrumented build (`-Pgo generate`, LTO; built in `outnx`, the use build must be there too) on the
+    user's console; one session, `out/pgo_streams/console_20261022/bejeweled3_pgo_1.stream`, merged into 159 `.gcda`
+    in `pgo/`. Then `-Pgo use`, LTO.
+  - Logging off by default (`app/bejeweled3_switch_defaults.toml`), the "[swtri]" hooks removed, the icon is the user's
+    picture (`out/icon.jpg`, outside the repository).
+  - Shaders, by the user's choice: the 18 the game compiles at run time (not in any of its files) are built into the
+    NRO (`tools/renut_release_shaders.py --image out/default_image.bin`: every translated shader the image does not
+    store); the installer page makes the 71 stored ones (its chain: 7 byte for byte, 64 with other SPIR-V temporary
+    numbers than the native chain).
+  - `tools/check_switch_build.py`: Bejeweled 3's own halt (`sub_8254E850`, Xbox360AppDriver::DoExit) and streaming
+    copies (`sub_825FA9B0`, `sub_825FA154`) replace Peggle 1's.
+  - The installer page: `D:\peggle 2\bejeweled3-nx-installer`, from peggle1-nx-installer without the title update and
+    DLC steps.
