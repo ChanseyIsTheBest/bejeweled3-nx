@@ -278,6 +278,9 @@ X_RESULT InputSystem::GetState(uint32_t user_index, X_INPUT_STATE* out_state) {
       continue;
     }
     active_devices_.Observe(user_index, id, state.gamepad);
+    if (state_observer_) {
+      state_observer_(user_index, id, state.gamepad);
+    }
     if (!any) {
       merged = state;
       any = true;

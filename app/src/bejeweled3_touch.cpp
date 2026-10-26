@@ -55,6 +55,8 @@ REXCVAR_DEFINE_INT32(bejeweled3_touch_height, 720, "Bejeweled3",
                      "The game's coordinate height the touch screen (or window) is scaled to, when the game has not set "
                      "its mouse rectangle");
 REXCVAR_DEFINE_BOOL(bejeweled3_touch_log, false, "Bejeweled3", "Log every touch handed to the game");
+REXCVAR_DEFINE_BOOL(bejeweled3_touch_hides_cursor, true, "Bejeweled3",
+                    "A touch hides the board's cursor (the bracket around a gem) until a pad's button or stick is used");
 REXCVAR_DEFINE_STRING(bejeweled3_touch_script, "", "Bejeweled3",
                       "Test runs: scripted touches, comma-separated \"<frame>:<down|move|up>:<x>:<y>\" in 1280x720 screen "
                       "pixels, frames counted by this file's dispatch (one a swap); empty = off");
@@ -300,6 +302,50 @@ REX_HOOK_RAW(sub_82406770) {
   REXLOG_INFO("[touch] the app object is at 0x{:08X} (widget manager +{})", app, kAppWidgetManager);
 }
 
+// The board's cursor while the touch screen is in use (the user, 2026-10-26: the bracket around a gem "disappears when
+// touching the screen and comes back when using stick and button controls"; bejeweled3_touch_hides_cursor).
+// The game already fades it: Board::Update (sub_82A1FFD0) fades the cursor out while the board's WantsCursor (vtable
+// slot 101, +404) returns false and back in when it returns true, and the board's draw (sub_82A26FE8) draws the bracket
+// at the cursor's column and row (+11688 / +11692) only while that fade (+11544) is above 0. Classic and Zen have
+// sub_82A0EA38 in that slot, the other boards sub_82976700, sub_829F8FF0 or sub_8297EB68: each "the board takes input"
+// (slot 100) with conditions of its own, and Board::Update is their only caller. A touch makes all four return false
+// until the pads' presses (input_script::PadPresses) change; the cursor keeps its place, and the game still moves it
+// and flags its gem as before (only the drawing fades).
+namespace {
+
+std::atomic<bool> g_cursor_hidden{false};
+std::atomic<uint64_t> g_cursor_hidden_at{0};  // PadPresses() when a touch hid the cursor
+
+void HideCursor() {
+  if (!REXCVAR_GET(bejeweled3_touch_hides_cursor)) return;
+  g_cursor_hidden_at.store(bejeweled3::input_script::PadPresses(), std::memory_order_relaxed);
+  g_cursor_hidden.store(true, std::memory_order_relaxed);
+}
+
+bool CursorHidden() {
+  if (!g_cursor_hidden.load(std::memory_order_relaxed)) return false;
+  if (bejeweled3::input_script::PadPresses() == g_cursor_hidden_at.load(std::memory_order_relaxed)) return true;
+  g_cursor_hidden.store(false, std::memory_order_relaxed);
+  return false;
+}
+
+}  // namespace
+
+#define BEJEWELED3_CURSOR_HOOK(name)    \
+  extern "C" REX_FUNC(__imp__##name);   \
+  REX_HOOK_RAW(name) {                  \
+    if (CursorHidden()) {               \
+      ctx.r3.u64 = 0;                   \
+      return;                           \
+    }                                   \
+    __imp__##name(ctx, base);           \
+  }
+BEJEWELED3_CURSOR_HOOK(sub_82A0EA38)  // Board (Classic, Zen)
+BEJEWELED3_CURSOR_HOOK(sub_82976700)
+BEJEWELED3_CURSOR_HOOK(sub_829F8FF0)
+BEJEWELED3_CURSOR_HOOK(sub_8297EB68)
+#undef BEJEWELED3_CURSOR_HOOK
+
 extern "C" REX_FUNC(__imp__sub_823FA450);  // WidgetManager::GetWidgetAt(x, y, int* local_x, int* local_y)
 extern "C" REX_FUNC(__imp__sub_823FAAA0);  // WidgetManager::TouchBegan(SexyTouch&)
 extern "C" REX_FUNC(__imp__sub_823FABD0);  // WidgetManager::TouchMoved(SexyTouch&)
@@ -527,6 +573,7 @@ void Dispatch(PPCContext& ctx, uint8_t* base) {
       x = left + std::min<int32_t>(int32_t(t.x * float(width)), width - 1);
       y = top + std::min<int32_t>(int32_t(t.y * float(height)), height - 1);
     }
+    if (t.phase == Phase::kBegan) HideCursor();
     // Gems: the board's own drag handling (MouseDrag, sub_82A10BF0) swapped the touch's gem and then, as the game
     // flags its cursor's gem again every frame, that one too (the swipe tests: "Illegal Move: Each swap must create a
     // row of three"). A touch on the board is taps instead, which the board handles right (a tap, then a tap on a

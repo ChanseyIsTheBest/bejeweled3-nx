@@ -32,4 +32,8 @@ InputFactory Wrap(InputFactory base);
 // next. A tap on the title screen presses START this way, and a tap on a list dialog's entry the pad's way to it.
 void Press(uint16_t buttons, uint32_t frames);
 
+// Pad presses so far, as the game reads its pads: a button pressed, or a stick or trigger pushed out of its rest, on any
+// pad but the touch controls' own (Press). A touch hides the board's cursor until this changes (bejeweled3_touch.cpp).
+uint64_t PadPresses();
+
 }  // namespace bejeweled3::input_script

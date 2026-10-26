@@ -37,6 +37,7 @@ using rex::X_STATUS;
 using rex::input::DeviceId;
 using rex::input::DeviceInfo;
 using rex::input::X_INPUT_CAPABILITIES;
+using rex::input::X_INPUT_GAMEPAD;
 using rex::input::X_INPUT_KEYSTROKE;
 using rex::input::X_INPUT_STATE;
 using rex::input::X_INPUT_VIBRATION;
@@ -340,7 +341,36 @@ class TouchPressDriver final : public rex::input::InputDriver {
   std::atomic<uint32_t> packet_{0x20000000};
 };
 
+// PadPresses: each device's state when the game last read it, and the presses counted from the changes. Only a change
+// counts (a button that went down, a stick or trigger that left its rest), so a pad held still, or a stick drifting
+// past its dead zone, cannot keep counting.
+std::atomic<uint64_t> g_pad_presses{0};
+std::mutex g_pads_mutex;
+std::vector<std::pair<DeviceId, X_INPUT_GAMEPAD>> g_pads;
+
+void ObservePad(uint32_t, DeviceId id, const X_INPUT_GAMEPAD& gamepad) {
+  if (id == kTouchDevice) {
+    return;
+  }
+  std::lock_guard<std::mutex> lock(g_pads_mutex);
+  auto it = std::find_if(g_pads.begin(), g_pads.end(), [&](const auto& p) { return p.first == id; });
+  if (it == g_pads.end()) {
+    g_pads.push_back({id, X_INPUT_GAMEPAD{}});
+    it = g_pads.end() - 1;
+  }
+  const X_INPUT_GAMEPAD& last = it->second;
+  const uint16_t pressed = uint16_t(gamepad.buttons) & uint16_t(~uint16_t(last.buttons));
+  if (pressed || (!rex::input::IsNeutral(gamepad) && rex::input::IsNeutral(last))) {
+    g_pad_presses.fetch_add(1, std::memory_order_relaxed);
+  }
+  it->second = gamepad;
+}
+
 }  // namespace
+
+uint64_t PadPresses() {
+  return g_pad_presses.load(std::memory_order_relaxed);
+}
 
 void Press(uint16_t buttons, uint32_t frames) {
   const uint64_t now = g_bejeweled3_game_frames.load(std::memory_order_relaxed);
@@ -361,6 +391,7 @@ InputFactory Wrap(InputFactory base) {
     }
     // The default input system is rex::input::InputSystem (CreateDefaultInputSystem).
     static_cast<rex::input::InputSystem*>(system.get())->AddDriver(std::make_unique<TouchPressDriver>());
+    static_cast<rex::input::InputSystem*>(system.get())->SetStateObserver(ObservePad);
     const std::string script = REXCVAR_GET(bejeweled3_input_script);
     const std::string script2 = REXCVAR_GET(bejeweled3_input_script_p2);
     if (script.empty() && script2.empty()) {

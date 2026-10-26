@@ -48,6 +48,8 @@ To build everything yourself instead, see [docs/building.md](docs/building.md).
 pause menu), the badges and the button prompts; drag the volume sliders. On the mode screen, tap a side gem to turn
 the ring and the middle gem to play. On the board, in every mode, tap a gem and then a neighbouring gem to swap them,
 or swipe a gem towards its neighbour. In Zen, tap the "Press RB for Zen Options" box for its options. **+** pauses.
+While you play by touch the board's cursor (the bracket around a gem) is hidden; it comes back when you use a
+controller's stick or buttons.
 
 **Controllers:** by default the face buttons work **by position, as on the Xbox 360 pad** the game was made for: the
 bottom button is the Xbox's A, the right one the Xbox's B, and so on.
@@ -83,6 +85,8 @@ The game has no multiplayer. Achievements and Leaderboards need Xbox LIVE, and t
 | `bejeweled3_language` | Empty (default): the console's system language (English when the game does not have it). Or `en`, `de`, `es`, `fr`, `it`, `ja` or `pt` |
 | `input_xbox_layout` | Face buttons by position (`true`, default) or by letter (`false`) |
 | `input_joycon_sideways` | A single Joy-Con held sideways (`true`, default) |
+| `input_joycon_sideways_stick` | With it, a single Joy-Con's stick turned for the sideways grip (`true`, default) |
+| `bejeweled3_touch_hides_cursor` | A touch hides the board's cursor until a controller is used (`true`, default) |
 
 </div>
 

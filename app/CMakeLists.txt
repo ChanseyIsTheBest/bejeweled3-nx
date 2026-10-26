@@ -588,7 +588,7 @@ if(REXGLUE_PLATFORM_SWITCH)
     # tools/switch_hot_functions.py and the console profiler's samples. It must come from the same build as the NRO.
     target_link_options(bejeweled3 PRIVATE "LINKER:-Map=${CMAKE_BINARY_DIR}/bejeweled3.map")
     # The homebrew menu's entry: name, author, version and icon (app/icon.jpg, 256x256 JPEG, when the project has one).
-    set(BEJEWELED3_VERSION "1.0.0" CACHE STRING "NRO display version" FORCE)
+    set(BEJEWELED3_VERSION "1.0.1" CACHE STRING "NRO display version" FORCE)
     # bejeweled3-nx (2026-10-22): no icon in the repository yet (peggle1-nx's app/icon.jpg was Peggle's, by the user's
     # exception for that game). Development builds take out/icon_dev.jpg: the game's own 64x64 game.png, scaled to
     # 256x256 on black (game data, never committed). The release icon (2026-10-22, the user's image for the final build,

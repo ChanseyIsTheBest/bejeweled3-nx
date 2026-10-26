@@ -11,6 +11,7 @@
  */
 
 #include <atomic>
+#include <functional>
 #include <memory>
 #include <vector>
 
@@ -40,6 +41,12 @@ class InputSystem : public system::IInputSystem {
   void AttachWindow(rex::ui::Window* window);
   void SetActiveCallback(std::function<bool()> callback);
 
+  /// Fork addition (bejeweled3-nx, 2026-10-26): called from GetState with each device's state as the guest reads it,
+  /// on the thread that reads it (the touch controls tell a pad's presses from their own). Set it before the guest
+  /// starts polling.
+  using StateObserver = std::function<void(uint32_t user_index, DeviceId id, const X_INPUT_GAMEPAD& gamepad)>;
+  void SetStateObserver(StateObserver observer) { state_observer_ = std::move(observer); }
+
   /// Replaces any previous assignment. Call before the guest starts polling.
   void SetDeviceAssignment(std::unique_ptr<DeviceAssignment> assignment);
 
@@ -61,6 +68,7 @@ class InputSystem : public system::IInputSystem {
 
   std::unique_ptr<DeviceAssignment> assignment_;
   ActiveDeviceTracker active_devices_;
+  StateObserver state_observer_;
 
   // Ordered by ordinal. Ordinals are never recycled, so unplugging pad one
   // does not renumber pad two.

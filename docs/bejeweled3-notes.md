@@ -750,3 +750,38 @@ able to tap and swipe the gems to swap them".
     copies (`sub_825FA9B0`, `sub_825FA154`) replace Peggle 1's.
   - The installer page: `D:\peggle 2\bejeweled3-nx-installer`, from peggle1-nx-installer without the title update and
     DLC steps.
+
+## 1.0.1: a sideways Joy-Con's stick; the cursor hidden while touching (2026-10-26)
+
+- **A single Joy-Con held sideways** moved the cursor a quarter turn off (pushing right moved it up): the input driver
+  was peggle2-nx 1.0.1's line for line. peggle2-nx 1.0.2's fix (`ec1a138`, from guwange-nx; peggle1-nx 1.0.2 has it
+  too): `Poll` turns the stick a quarter, the left Joy-Con's to `{-y, x}` and the right one's to `{y, -x}`; new key
+  `input_joycon_sideways_stick` (on by default, built in).
+- **The board's cursor while touching** (the user: the bracket "disappears when touching the screen and comes back
+  when using stick and button controls"; `bejeweled3_touch_hides_cursor`, on by default):
+  - The game fades its cursor itself. `Board::Update` (`sub_82A1FFD0`) fades it out while the board's virtual
+    WantsCursor (vtable slot 101, +404) returns false and in when it returns true. The board's draw (`sub_82A26FE8`)
+    draws the bracket at the cursor's column and row (+11688 / +11692; -1 = none) only while that fade (+11544) is
+    above 0, in one of two images by whether the cursor's gem is the selected one (`sub_82A0FBB8`).
+  - Slot 101 holds `sub_82A0EA38` in Classic's and Zen's boards (and two more board classes), and `sub_82976700`,
+    `sub_829F8FF0` or `sub_8297EB68` in the other 16 board classes (every vtable whose MouseDown is `sub_82A1AE50`):
+    each is slot 100 ("the board takes input", `sub_82A13050` for Board) with conditions of its own. Board::Update is
+    their only caller (virtual calls only; its hot copy calls through `REX_CALL_INDIRECT_FUNC` too).
+  - The cursor's gem flag (+604) is set by `sub_82A13F78` from slot 100, not 101, and no drawing reads it (its other
+    reader, `sub_82A2EA48`, writes the save): hiding changes the bracket only.
+  - The port: a touch (any, on any screen) makes the four return false until a pad is used. `InputSystem` got a state
+    observer (`SetStateObserver`, called from `GetState` with each device's state as the game reads it); the input
+    script module counts presses from it (`input_script::PadPresses`: a button going down, a stick or trigger leaving
+    its rest; the touch controls' own pad excluded), so a pad held still or a drifting stick cannot bring it back.
+- **Checked** (seed 20261022; the touch route to Classic, then pad RIGHT at frame 3300, a swipe that matches at 3700,
+  pad LEFT at 4300; `out/renut_tests/<run>/cursor_events.png` shows the board before and after each):
+  - PC `cursor2`: hidden after the menu taps, back after RIGHT, hidden after the swipe, back after LEFT (moved one
+    gem). The control `cursor2off` (`bejeweled3_touch_hides_cursor = false`): the bracket stays throughout; the same
+    boards, swap and score. `cursor1` (a single tap, then LEFT): the tap had selected a gem, so LEFT swapped it ("Illegal
+    Move"), the game's own select-then-direction rule, with or without this change.
+  - Ryujinx `cursor_emu3`, the 1.0.1 release NRO: the same four steps ("GOOD!" on the swipe). The frame-timed route
+    needs about 165 s there.
+- 1.0.1 build: `outnx` (LTO + PGO from the 1.0.0 profile; the changed functions have none), `check_switch_build.py`
+  all checks passed, the four hooks strong symbols in the ELF. NRO SHA-256 `6d1ae5bc...584b67`, 44,756,063 bytes;
+  ELF and map `out/nx/elf/bejeweled3_1.0.1_lto_pgouse_20261026_1207.*`; delivered as
+  `out/dist/release_1.0.1/bejeweled3-nx/` (NRO and LICENSES.txt: replace the NRO of an installed 1.0.0).
