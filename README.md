@@ -2,7 +2,7 @@
 
 <h1 align=center>Bejeweled 3: Nintendo Switch port</h1>
 
-<p align=center><b>bejeweled3-nx 1.0.1</b> · <a href="https://chanseyisthebest.github.io/bejeweled3-nx-installer/">web installer</a> · <a href="https://github.com/ChanseyIsTheBest/bejeweled3-nx/releases/tag/v1.0.1">release</a></p>
+<p align=center><b>bejeweled3-nx 1.0.2</b> · <a href="https://chanseyisthebest.github.io/bejeweled3-nx-installer/">web installer</a> · <a href="https://github.com/ChanseyIsTheBest/bejeweled3-nx/releases/tag/v1.0.2">release</a></p>
 
 An unofficial native port of the Xbox 360 (Xbox Live Arcade) version of **Bejeweled 3**, with touch controls. Made by
 static recompilation with [ReXGlue](https://github.com/rexglue/rexglue-sdk), from the
@@ -33,6 +33,12 @@ Features:
 - Face buttons work by position as on the Xbox 360 pad (`input_xbox_layout = false` for by letter); a single Joy-Con
   can be held sideways.
 - Settings are in `bejeweled3.toml` next to the NRO; delete it to get the defaults back.
+- A game menu: hold **A + B + X + Y + L + R** together (**+** closes it) for the settings (language, rumble, button
+  layout, Joy-Con, touch, and the menu's own buttons, colour, font and background), the achievements and each player's
+  controls. It saves your choices in `bejeweled3.toml`.
+- Rumble: the game's own vibration, on by default (off in the menu, or `input_rumble = false`).
+- A smaller install: the installer stores the game files compressed, with the sounds as Opus and the intro movie as
+  H.265 (played by the Switch's video decoder).
 - No log files, except `logs/rex/rex_crash.log` after a crash.
 
 Known issue:
